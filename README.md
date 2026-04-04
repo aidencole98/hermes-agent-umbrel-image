@@ -1,6 +1,9 @@
 # hermes-agent-umbrel-image
 
-Public image-source repository for `ghcr.io/aidencole98/hermes-agent-umbrel`, a multi-arch replacement for the upstream `NousResearch/hermes-agent` container.
+Public image-source repository for:
+
+- `ghcr.io/aidencole98/hermes-agent-umbrel` — multi-arch replacement for the upstream `NousResearch/hermes-agent` container
+- `ghcr.io/aidencole98/hermes-agent-web-ui` — multi-arch landing-page image for the Umbrel package
 
 This package is intentionally kept close to upstream `v2026.4.3` so it can later be swapped back to an official image with minimal compose changes:
 
@@ -28,6 +31,8 @@ The main difference is platform support: this image is built for both `linux/amd
 
 - `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.3`
 - `ghcr.io/aidencole98/hermes-agent-umbrel:latest`
+- `ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.3`
+- `ghcr.io/aidencole98/hermes-agent-web-ui:latest`
 
 `v2026.4.3` is the versioned release tag. `latest` tracks the default branch build.
 
@@ -84,7 +89,12 @@ The container preserves the upstream `/opt/data` data volume and entrypoint boot
 
 ## GitHub Actions
 
-`.github/workflows/build.yml` publishes:
+`.github/workflows/build.yml` publishes both images:
+
+- `ghcr.io/aidencole98/hermes-agent-umbrel`
+- `ghcr.io/aidencole98/hermes-agent-web-ui`
+
+Tags published:
 
 - `latest` on pushes to the default branch
 - exact `v*` tags on tag pushes
