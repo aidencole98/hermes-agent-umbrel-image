@@ -4,6 +4,7 @@ Public image-source repository for:
 
 - `ghcr.io/aidencole98/hermes-agent-umbrel` — multi-arch replacement for the upstream `NousResearch/hermes-agent` container
 - `ghcr.io/aidencole98/hermes-agent-web-ui` — multi-arch landing-page image for the Umbrel package
+- `ghcr.io/aidencole98/hermes-workspace-umbrel` — multi-arch Hermes Workspace runtime for Umbrel
 
 This package is intentionally kept close to upstream `v2026.4.3` so it can later be swapped back to an official image with minimal compose changes:
 
@@ -27,14 +28,32 @@ The main difference is platform support: this image is built for both `linux/amd
 - Source sha256: `80033597933cd76e7604653219c36822b9aabe7644a4abc106e4e26abf14d9ea`
 - Base image: `debian:13.4@sha256:55a15a112b42be10bfc8092fcc40b6748dc236f7ef46a358d9392b339e9d60e8`
 
+## Workspace Source
+
+- Upstream repo: <https://github.com/outsourc-e/hermes-workspace>
+- Upstream version: `0.1.0`
+- Upstream commit: `b4775f8efd530c1257fa1a591718a6a8c3f98da3`
+- Source tarball: <https://github.com/outsourc-e/hermes-workspace/archive/b4775f8efd530c1257fa1a591718a6a8c3f98da3.tar.gz>
+- Source sha256: `916d6391c45930b48a05242323a9c105691a2474cca4877a5b66e80bf843e6b7`
+- Runtime details:
+  - built with `pnpm`
+  - started with `node server-entry.js`
+  - listens on port `3000`
+  - runs as uid/gid `1000:1000`
+  - includes `python3`, `bash`, `git`, `curl`, and `ripgrep`
+  - sets `HOME=/home/hermes`
+  - sets `HERMES_HOME=/home/hermes/.hermes`
+
 ## Image Tags
 
 - `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.3`
 - `ghcr.io/aidencole98/hermes-agent-umbrel:latest`
 - `ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.3`
 - `ghcr.io/aidencole98/hermes-agent-web-ui:latest`
+- `ghcr.io/aidencole98/hermes-workspace-umbrel:0.1.0`
+- `ghcr.io/aidencole98/hermes-workspace-umbrel:latest`
 
-`v2026.4.3` is the versioned release tag. `latest` tracks the default branch build.
+`v2026.4.3` is the current Hermes Agent release tag. `0.1.0` is the current Hermes Workspace source version. `latest` tracks the default branch build. On repo tag pushes, GitHub Actions also publishes matching `v*` tags for all three images.
 
 ## Build
 
@@ -70,6 +89,21 @@ docker buildx build \
   .
 ```
 
+Build and push the Hermes Workspace image:
+
+```bash
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --build-arg HERMES_WORKSPACE_VERSION=0.1.0 \
+  --build-arg HERMES_WORKSPACE_COMMIT=b4775f8efd530c1257fa1a591718a6a8c3f98da3 \
+  --build-arg HERMES_WORKSPACE_SOURCE_SHA256=916d6391c45930b48a05242323a9c105691a2474cca4877a5b66e80bf843e6b7 \
+  -f workspace/Dockerfile \
+  -t ghcr.io/aidencole98/hermes-workspace-umbrel:0.1.0 \
+  -t ghcr.io/aidencole98/hermes-workspace-umbrel:latest \
+  --push \
+  .
+```
+
 ## Run
 
 Example:
@@ -93,6 +127,7 @@ The container preserves the upstream `/opt/data` data volume and entrypoint boot
 
 - `ghcr.io/aidencole98/hermes-agent-umbrel`
 - `ghcr.io/aidencole98/hermes-agent-web-ui`
+- `ghcr.io/aidencole98/hermes-workspace-umbrel`
 
 Tags published:
 
