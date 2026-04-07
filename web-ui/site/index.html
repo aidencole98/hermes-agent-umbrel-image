@@ -3,45 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hermes Agent Terminal</title>
+  <title>Hermes Agent</title>
   <link rel="stylesheet" href="/vendor/xterm.css">
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #0d0d0d;
-      --panel: #161616;
-      --panel-2: #1d1d1d;
-      --line: #2a2a2a;
-      --text: #f2ede3;
-      --muted: #aa9d8f;
-      --accent: #f3b23a;
-      --accent-2: #ff7b32;
-      --success: #34d399;
-      --danger: #f87171;
-      --shadow: 0 26px 80px rgba(0, 0, 0, 0.48);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+      background:
+        radial-gradient(circle at 16% 14%, rgba(255, 217, 93, 0.11), transparent 20%),
+        radial-gradient(circle at 84% 12%, rgba(255, 90, 45, 0.12), transparent 24%),
+        radial-gradient(circle at 52% 100%, rgba(255, 127, 31, 0.08), transparent 30%),
+        linear-gradient(180deg, #121212 0%, #0D0D0D 100%);
+      color: #F0EDE8;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
       overflow: hidden;
-      background:
-        radial-gradient(circle at top left, rgba(243, 178, 58, 0.08), transparent 24%),
-        radial-gradient(circle at top right, rgba(255, 123, 50, 0.08), transparent 24%),
-        linear-gradient(180deg, #111111 0%, #0d0d0d 100%);
-      color: var(--text);
-      font-family: Inter, "Segoe UI", sans-serif;
     }
 
     .header {
@@ -49,110 +27,128 @@
       max-width: 960px;
       width: 100%;
       margin: 0 auto;
-      padding: 36px 32px 0;
+      padding: 40px 32px 0;
     }
 
     .header-top {
       display: flex;
-      align-items: flex-start;
-      gap: 16px;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .header-logo-wrap {
+      flex-shrink: 0;
+      padding: 6px 14px 12px 0;
+      margin-left: -12px;
     }
 
     .header-logo {
-      width: 96px;
-      height: 96px;
-      border-radius: 24px;
+      display: block;
+      width: 84px;
+      height: 84px;
       object-fit: cover;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+      border-radius: 18px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 0 26px rgba(255, 90, 45, 0.12);
+      filter: drop-shadow(0 0 18px rgba(255, 217, 93, 0.08));
     }
 
     .header-text {
       flex: 1;
-      padding-top: 10px;
+      margin-top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     h1 {
-      margin-bottom: 6px;
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 600;
-      line-height: 1.25;
-      letter-spacing: -0.03em;
+      line-height: 1.3;
+      color: #F0EDE8;
+      margin-bottom: 4px;
     }
 
     .subtitle {
-      max-width: 62ch;
       font-size: 14px;
-      line-height: 1.7;
-      color: var(--muted);
+      line-height: 1.6;
+      color: #A89F99;
     }
 
     .pro-tip {
-      margin-top: 16px;
-      border: 1px solid var(--line);
-      border-left: 3px solid var(--accent-2);
-      border-radius: 8px;
-      background: rgba(29, 29, 29, 0.92);
-      padding: 14px 16px;
+      background: #1A1A1A;
+      border: 1px solid #2A2A2A;
+      border-left: 3px solid #FF5A2D;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 12px;
       font-size: 13px;
-      line-height: 1.7;
-      color: var(--muted);
+      color: #A89F99;
+      line-height: 1.6;
     }
 
     .pro-tip strong {
-      color: var(--text);
+      color: #F0EDE8;
       font-weight: 600;
     }
 
     .pro-tip code {
-      color: #ffd487;
-      font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      color: #FFBE2E;
+      font-family: 'Menlo', 'Monaco', 'Cascadia Code', 'Courier New', monospace;
       font-size: 0.95em;
+    }
+
+    .pro-tip em {
+      color: #6B6460;
+      font-style: normal;
     }
 
     .mobile-note {
       display: none;
-      margin-top: 14px;
-      border: 1px solid var(--line);
+      background: #1F1F1F;
+      border: 1px solid #2A2A2A;
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 12px 16px;
+      margin-top: 14px;
       font-size: 13px;
-      line-height: 1.6;
-      color: var(--muted);
-      background: rgba(31, 31, 31, 0.92);
+      color: #A89F99;
+      line-height: 1.5;
     }
 
     .terminal-wrapper {
       flex: 1;
       display: flex;
       flex-direction: column;
-      min-height: 0;
       max-width: 960px;
       width: 100%;
       margin: 0 auto;
       padding: 20px 32px 40px;
+      min-height: 0;
     }
 
     .terminal-card {
       flex: 1;
       display: flex;
       flex-direction: column;
-      min-height: 0;
+      border-radius: 10px;
+      border: 1px solid #2A2A2A;
       overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      box-shadow: 0 0 0 1px rgba(243, 178, 58, 0.05), var(--shadow);
-      background: var(--panel);
+      max-height: 800px;
+      background: linear-gradient(180deg, rgba(24,24,24,0.92), rgba(17,17,17,0.98));
+      box-shadow:
+        0 0 0 1px rgba(255,90,45,0.08),
+        0 0 42px rgba(255,127,31,0.08),
+        0 20px 60px rgba(0,0,0,0.5);
     }
 
     .titlebar {
       flex-shrink: 0;
+      height: 36px;
+      background: #1A1A1A;
+      border-bottom: 1px solid #2A2A2A;
       display: flex;
       align-items: center;
-      gap: 8px;
-      height: 38px;
       padding: 0 14px;
-      border-bottom: 1px solid var(--line);
-      background: var(--panel-2);
+      gap: 8px;
     }
 
     .titlebar-dot {
@@ -161,38 +157,37 @@
       border-radius: 50%;
     }
 
-    .titlebar-dot.close { background: #ff5a60; }
-    .titlebar-dot.minimize { background: #ffbe2e; }
-    .titlebar-dot.maximize { background: #27ca40; }
+    .titlebar-dot.close { background: #FF5A60; }
+    .titlebar-dot.minimize { background: #FFBE2E; }
+    .titlebar-dot.maximize { background: #27CA40; }
 
     .titlebar-label {
       flex: 1;
-      margin-right: 52px;
       text-align: center;
-      color: #6f665e;
+      font-family: 'Menlo', 'Monaco', 'Cascadia Code', 'Courier New', monospace;
       font-size: 12px;
       font-weight: 500;
-      font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      color: #6B6460;
+      margin-right: 52px;
     }
 
     .terminal-info {
       flex-shrink: 0;
-      padding: 12px 16px 10px;
-      border-bottom: 1px solid var(--line);
       background: #141414;
-      font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      padding: 12px 16px 8px;
+      font-family: 'Menlo', 'Monaco', 'Cascadia Code', 'Courier New', monospace;
       font-size: 13px;
-      line-height: 1.6;
-      color: var(--muted);
+      line-height: 1.5;
+      border-bottom: 1px solid #2A2A2A;
     }
 
     .terminal-info .info-heading {
-      color: #d7d1c8;
-      font-weight: 700;
+      color: #D4D0CB;
+      font-weight: bold;
     }
 
-    .terminal-info code {
-      color: #ffd487;
+    .terminal-info .info-dim {
+      color: #6B6460;
     }
 
     .terminal-body {
@@ -203,180 +198,142 @@
     }
 
     .terminal-body .xterm {
-      height: 100%;
-      padding: 10px 8px;
+      padding: 8px;
     }
 
-    .terminal-body .xterm-viewport::-webkit-scrollbar {
-      display: none;
-    }
-
-    .terminal-body .xterm-viewport {
-      scrollbar-width: none;
-    }
+    .terminal-body .xterm-viewport::-webkit-scrollbar { display: none; }
+    .terminal-body .xterm-viewport { scrollbar-width: none; }
 
     .terminal-footer {
       flex-shrink: 0;
+      background: #1A1A1A;
+      border-top: 1px solid #2A2A2A;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      min-height: 42px;
       padding: 8px 14px;
-      border-top: 1px solid var(--line);
-      background: var(--panel-2);
+      min-height: 40px;
     }
 
     .footer-message {
-      color: #7b726a;
       font-size: 12px;
+      color: #6B6460;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .footer-message.success {
-      color: var(--success);
+    .footer-message.success { color: #34D399; }
+    .footer-message.error { color: #F87171; }
+
+    .footer-hints {
+      font-size: 11px;
+      color: #6B6460;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .footer-message.error {
-      color: var(--danger);
+    .footer-hints kbd {
+      background: #2A2A2A;
+      border: 1px solid #3A3A3A;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: inherit;
+      font-size: 10px;
+      color: #A89F99;
     }
 
     .footer-right {
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .footer-hints {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: #7b726a;
-      font-size: 11px;
-    }
-
-    .footer-hints kbd {
-      border: 1px solid #3a3a3a;
-      border-radius: 4px;
-      background: #2a2a2a;
-      padding: 1px 5px;
-      color: #aaa097;
-      font-family: inherit;
-      font-size: 10px;
+      gap: 10px;
     }
 
     .btn-restart {
-      border: 1px solid var(--line);
-      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
       background: transparent;
-      color: #b6a99a;
-      padding: 6px 12px;
+      border: 1px solid #2A2A2A;
+      color: #A89F99;
+      border-radius: 6px;
+      font-family: inherit;
       font-size: 12px;
       font-weight: 500;
       cursor: pointer;
-      transition: border-color 0.15s ease, color 0.15s ease;
+      transition: border-color 0.15s, color 0.15s;
     }
 
     .btn-restart:hover {
-      border-color: var(--accent-2);
-      color: var(--accent-2);
+      border-color: #FF5A2D;
+      color: #FF5A2D;
     }
 
     @media (pointer: coarse) {
-      .mobile-note {
-        display: block;
-      }
+      .mobile-note { display: block; }
     }
 
-    @media (max-width: 680px) {
-      .header {
-        padding: 18px 16px 0;
-      }
-
-      .header-top {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .header-logo {
-        width: 72px;
-        height: 72px;
-      }
-
-      h1 {
-        font-size: 22px;
-      }
-
-      .terminal-wrapper {
-        padding: 16px 16px 20px;
-      }
-
-      .terminal-footer {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .footer-right {
-        width: 100%;
-        justify-content: space-between;
-      }
+    @media (max-width: 600px) {
+      .header { padding: 12px 16px 0; }
+      .header-top { flex-direction: column; align-items: center; text-align: center; gap: 0; margin-bottom: 0; }
+      .header-logo { display: none; }
+      .header-text { margin-top: 0; }
+      h1 { font-size: 18px; margin-bottom: 2px; }
+      .subtitle { font-size: 13px; margin-bottom: 4px; }
+      .mobile-note { font-size: 12px; padding: 8px 12px; margin-top: 4px; }
+      .pro-tip { display: none; }
+      .terminal-info { display: none; }
+      .terminal-wrapper { padding: 8px 16px 8px; }
+      .terminal-footer { padding: 6px 8px; min-height: 32px; }
+      .btn-restart { padding: 4px 10px; font-size: 11px; }
+      .footer-message { font-size: 11px; }
+      .footer-hints { display: none; }
     }
   </style>
 </head>
 <body>
-  <header class="header">
+  <div class="header">
     <div class="header-top">
-      <img class="header-logo" src="/assets/hermes-dotmark.png" alt="Hermes logo">
+      <div class="header-logo-wrap">
+        <img src="/assets/hermes-agent-icon.png" alt="Hermes Agent" class="header-logo">
+      </div>
       <div class="header-text">
-        <h1>Hermes Agent runs here. Use the browser terminal to drive the native CLI.</h1>
-        <p class="subtitle">
-          This web UI is a direct terminal into the Hermes container, working from <code>/opt/data</code> with the Hermes CLI already on the path.
-          If your model is not configured yet, run <code>hermes model</code> first, then start a session with <code>hermes</code>.
-        </p>
+        <h1>Hermes Agent</h1>
+        <p class="subtitle">The AI agent that grows with you.</p>
       </div>
     </div>
     <div class="pro-tip">
-      <strong>Tip:</strong> this shell is persistent against the same Hermes data volume used by the backend image. Use it for setup, daily CLI sessions, and local files under <code>/opt/data</code>.
+      <strong>Tip:</strong> First time? Run <code>/model</code> to first choose your AI provider and model. Then chat with your agent on how to setup Telegram, Signal, WhatsApp, etc.
     </div>
     <div class="mobile-note">
-      Mobile browsers work for quick checks, but a desktop browser is better for full-screen terminal sessions and keyboard shortcuts.
+      For the best experience, complete setup on a desktop browser.
     </div>
-  </header>
+  </div>
 
-  <main class="terminal-wrapper">
-    <section class="terminal-card">
+  <div class="terminal-wrapper">
+    <div class="terminal-card">
       <div class="titlebar">
-        <span class="titlebar-dot close"></span>
-        <span class="titlebar-dot minimize"></span>
-        <span class="titlebar-dot maximize"></span>
-        <div class="titlebar-label">hermes-agent :: /opt/data</div>
+        <div class="titlebar-dot close"></div>
+        <div class="titlebar-dot minimize"></div>
+        <div class="titlebar-dot maximize"></div>
+        <span class="titlebar-label">Hermes Agent</span>
       </div>
-
-      <div class="terminal-info">
-        <div><span class="info-heading">Start here:</span> run <code>hermes model</code> if needed, then <code>hermes</code>.</div>
-        <div>Interactive shell in <code>/opt/data</code> with Hermes CLI available directly.</div>
+      <div class="terminal-body">
+        <div id="terminal"></div>
       </div>
-
-      <div id="terminal" class="terminal-body"></div>
-
       <div class="terminal-footer">
-        <div id="status" class="footer-message">Connecting to Hermes terminal...</div>
-        <div class="footer-right">
-          <div class="footer-hints">
-            <span>Paste</span>
-            <kbd>Ctrl</kbd>
-            <span>+</span>
-            <kbd>Shift</kbd>
-            <span>+</span>
-            <kbd>V</kbd>
-          </div>
-          <button id="restart" class="btn-restart" type="button">Restart Shell</button>
-        </div>
+        <span class="footer-hints">
+          <kbd>↑↓</kbd> Navigate <kbd>Enter</kbd> Select <kbd id="paste-hint">Ctrl+V</kbd> Paste
+        </span>
+        <span class="footer-right">
+          <span id="footer-message" class="footer-message"></span>
+          <button id="btn-restart" class="btn-restart" onclick="this.blur(); location.reload()">&#x21bb; Start over</button>
+        </span>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
 
   <script src="/vendor/xterm.js"></script>
   <script src="/vendor/xterm-addon-fit.js"></script>

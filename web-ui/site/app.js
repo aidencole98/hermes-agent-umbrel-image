@@ -1,124 +1,111 @@
-(function () {
-  const terminalElement = document.getElementById("terminal");
-  const statusElement = document.getElementById("status");
-  const restartButton = document.getElementById("restart");
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const socketUrl = `${protocol}//${window.location.host}/api/terminal`;
+document.addEventListener('DOMContentLoaded', () => {
+  const footerMessage = document.getElementById('footer-message');
+  const restartButton = document.getElementById('btn-restart');
 
-  const terminal = new window.Terminal({
+  const term = new Terminal({
     cursorBlink: true,
-    convertEol: true,
-    fontFamily: '"SFMono-Regular", Menlo, Consolas, monospace',
-    fontSize: 14,
-    lineHeight: 1.35,
+    cursorStyle: 'block',
+    fontSize: 13,
+    fontFamily: "'Menlo', 'Monaco', 'Cascadia Code', 'Courier New', monospace",
+    lineHeight: 1.2,
     theme: {
-      background: "#141414",
-      foreground: "#F2EDE3",
-      cursor: "#F3B23A",
-      selectionBackground: "rgba(243, 178, 58, 0.22)",
-      black: "#141414",
-      red: "#FF6B6B",
-      green: "#34D399",
-      yellow: "#F3B23A",
-      blue: "#7DD3FC",
-      magenta: "#F9A8D4",
-      cyan: "#67E8F9",
-      white: "#F2EDE3",
-      brightBlack: "#6F665E",
-      brightRed: "#F87171",
-      brightGreen: "#6EE7B7",
-      brightYellow: "#FCD34D",
-      brightBlue: "#BAE6FD",
-      brightMagenta: "#FBCFE8",
-      brightCyan: "#A5F3FC",
-      brightWhite: "#FFF7ED"
+      background: '#141414',
+      foreground: '#D4D0CB',
+      cursor: '#FF5A2D',
+      cursorAccent: '#141414',
+      selectionBackground: 'rgba(255,90,45,0.25)',
+      black: '#1A1A1A',
+      red: '#E06C75',
+      green: '#98C379',
+      yellow: '#E5C07B',
+      blue: '#61AFEF',
+      magenta: '#C678DD',
+      cyan: '#56B6C2',
+      white: '#ABB2BF',
+      brightBlack: '#3D4048',
+      brightRed: '#F87171',
+      brightGreen: '#34D399',
+      brightYellow: '#FBBF24',
+      brightBlue: '#7BB8F5',
+      brightMagenta: '#D4A4E0',
+      brightCyan: '#6EC9D4',
+      brightWhite: '#F0EDE8'
+    },
+    scrollback: 1000,
+    rows: 24,
+    cols: 80
+  });
+
+  const fitAddon = new FitAddon.FitAddon();
+  term.loadAddon(fitAddon);
+  term.open(document.getElementById('terminal'));
+  fitAddon.fit();
+  term.focus();
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.btn-restart')) {
+      term.focus();
     }
   });
-  const fitAddon = new window.FitAddon.FitAddon();
 
-  let socket;
-
-  terminal.loadAddon(fitAddon);
-  terminal.open(terminalElement);
-
-  function setStatus(message, tone) {
-    statusElement.textContent = message;
-    statusElement.className = "footer-message";
-    if (tone) {
-      statusElement.classList.add(tone);
-    }
+  if (navigator.platform.indexOf('Mac') !== -1) {
+    document.getElementById('paste-hint').textContent = '⌘V';
   }
 
-  function sendResize() {
-    if (!socket || socket.readyState !== window.WebSocket.OPEN) {
-      return;
-    }
-    socket.send(JSON.stringify({
-      type: "resize",
-      cols: terminal.cols,
-      rows: terminal.rows
-    }));
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  let ws = new WebSocket(proto + '//' + location.host + '/api/terminal');
+
+  function setFooter(message, mode = '') {
+    footerMessage.textContent = message;
+    footerMessage.className = 'footer-message';
+    if (mode) footerMessage.classList.add(mode);
   }
 
-  function fitTerminal() {
+  ws.onopen = () => {
+    setFooter('Connected to Hermes Agent terminal.', 'success');
+    ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+    term.focus();
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data);
+      if (msg.type === 'output') {
+        term.write(msg.data);
+      } else if (msg.type === 'exit') {
+        term.write('\r\n\x1b[38;5;242mTerminal session ended. Click "Start over" below to open a fresh shell.\x1b[0m\r\n');
+        setFooter('Terminal exited unexpectedly.', 'error');
+      }
+    } catch (e) {}
+  };
+
+  ws.onclose = () => {
+    if (!footerMessage.textContent.includes('exited')) {
+      setFooter('Connection lost.', 'error');
+    }
+  };
+
+  ws.onerror = () => {
+    setFooter('Connection error.', 'error');
+  };
+
+  term.onData((data) => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'input', data }));
+    }
+  });
+
+  const resizeObserver = new ResizeObserver(() => {
     fitAddon.fit();
-    sendResize();
-  }
-
-  function connect() {
-    if (socket && (socket.readyState === window.WebSocket.OPEN || socket.readyState === window.WebSocket.CONNECTING)) {
-      return;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
     }
-
-    terminal.reset();
-    setStatus("Connecting to Hermes terminal...");
-    socket = new window.WebSocket(socketUrl);
-
-    socket.addEventListener("open", function () {
-      setStatus("Connected to Hermes terminal", "success");
-      fitTerminal();
-      terminal.focus();
-    });
-
-    socket.addEventListener("message", function (event) {
-      const payload = JSON.parse(event.data);
-      if (payload.type === "output") {
-        terminal.write(payload.data);
-        return;
-      }
-
-      if (payload.type === "exit") {
-        setStatus(`Shell exited (${payload.exitCode ?? "?"}). Restart to open a new session.`, "error");
-      }
-    });
-
-    socket.addEventListener("close", function () {
-      if (!statusElement.classList.contains("error")) {
-        setStatus("Disconnected from Hermes terminal", "error");
-      }
-    });
-
-    socket.addEventListener("error", function () {
-      setStatus("Terminal connection failed", "error");
-    });
-  }
-
-  terminal.onData(function (data) {
-    if (!socket || socket.readyState !== window.WebSocket.OPEN) {
-      return;
-    }
-    socket.send(JSON.stringify({ type: "input", data }));
   });
+  resizeObserver.observe(document.getElementById('terminal'));
 
-  window.addEventListener("resize", fitTerminal);
-
-  restartButton.addEventListener("click", function () {
-    if (socket) {
-      socket.close();
-    }
-    connect();
+  restartButton.addEventListener('click', () => {
+    try {
+      ws.close();
+    } catch (e) {}
   });
-
-  window.setTimeout(fitTerminal, 0);
-  connect();
-}());
+});

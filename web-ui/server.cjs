@@ -11,6 +11,7 @@ const SITE_DIR = path.join(APP_DIR, "site");
 const DATA_DIR = process.env.HERMES_HOME || "/opt/data";
 const SHELL = process.env.SHELL || "/bin/bash";
 const TERM = "xterm-256color";
+const START_COMMAND = process.env.HERMES_WEB_COMMAND || "cd /opt/data && exec hermes";
 
 let activePty = null;
 
@@ -60,7 +61,7 @@ function spawnShell() {
     }
   }
 
-  activePty = pty.spawn(SHELL, ["--login", "-i"], {
+  activePty = pty.spawn(SHELL, ["--login", "-i", "-c", START_COMMAND], {
     name: TERM,
     cols: 120,
     rows: 32,
