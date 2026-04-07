@@ -6,7 +6,7 @@ Public image-source repository for:
 - `ghcr.io/aidencole98/hermes-agent-web-ui` — multi-arch landing-page image for the Umbrel package
 - `ghcr.io/aidencole98/hermes-workspace-umbrel` — multi-arch Hermes Workspace runtime for Umbrel
 
-This package is intentionally kept close to upstream `v2026.4.3` so it can later be swapped back to an official image with minimal compose changes:
+This package is intentionally kept close to upstream Hermes Agent so it can later be swapped back to an official image with minimal compose changes. The current Umbrel build tracks upstream `main` at commit `b2f477a30b3c05d0f383c543af98496ae8a96070` (`2026-04-07`) because the branch has moved well past the last tagged release.
 
 - Debian-based image
 - source unpacked into `/opt/hermes`
@@ -23,9 +23,11 @@ The main difference is platform support: this image is built for both `linux/amd
 ## Upstream Source
 
 - Upstream repo: <https://github.com/NousResearch/hermes-agent>
-- Upstream tag: `v2026.4.3`
-- Source tarball: <https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.4.3.tar.gz>
-- Source sha256: `80033597933cd76e7604653219c36822b9aabe7644a4abc106e4e26abf14d9ea`
+- Last tagged upstream release: `v2026.4.3`
+- Current packaged upstream ref: `b2f477a30b3c05d0f383c543af98496ae8a96070`
+- Commit date: `2026-04-07T08:40:22-04:00`
+- Source tarball: <https://github.com/NousResearch/hermes-agent/archive/b2f477a30b3c05d0f383c543af98496ae8a96070.tar.gz>
+- Source sha256: `a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742`
 - Base image: `debian:13.4@sha256:55a15a112b42be10bfc8092fcc40b6748dc236f7ef46a358d9392b339e9d60e8`
 
 ## Workspace Source
@@ -46,14 +48,14 @@ The main difference is platform support: this image is built for both `linux/amd
 
 ## Image Tags
 
-- `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.3`
+- `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a`
 - `ghcr.io/aidencole98/hermes-agent-umbrel:latest`
 - `ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.3`
 - `ghcr.io/aidencole98/hermes-agent-web-ui:latest`
 - `ghcr.io/aidencole98/hermes-workspace-umbrel:0.1.0`
 - `ghcr.io/aidencole98/hermes-workspace-umbrel:latest`
 
-`v2026.4.3` is the current Hermes Agent release tag. `0.1.0` is the current Hermes Workspace source version. `latest` tracks the default branch build. On repo tag pushes, GitHub Actions also publishes matching `v*` tags for all three images.
+`v2026.4.7-b2f477a` is the current Hermes Agent Umbrel image tag and packages upstream `main` at `b2f477a30b3c05d0f383c543af98496ae8a96070`. `0.1.0` is the current Hermes Workspace source version. `latest` tracks the default branch build. On repo tag pushes, GitHub Actions also publishes matching `v*` tags for all three images.
 
 ## Build
 
@@ -69,9 +71,10 @@ Build and push the release tag:
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg HERMES_VERSION=v2026.4.3 \
-  --build-arg HERMES_SOURCE_SHA256=80033597933cd76e7604653219c36822b9aabe7644a4abc106e4e26abf14d9ea \
-  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.3 \
+  --build-arg HERMES_REF=b2f477a30b3c05d0f383c543af98496ae8a96070 \
+  --build-arg HERMES_SOURCE_SHA256=a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742 \
+  --build-arg IMAGE_VERSION=v2026.4.7-b2f477a \
+  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
   --push \
   .
 ```
@@ -81,9 +84,10 @@ Build and push both the release tag and `latest`:
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg HERMES_VERSION=v2026.4.3 \
-  --build-arg HERMES_SOURCE_SHA256=80033597933cd76e7604653219c36822b9aabe7644a4abc106e4e26abf14d9ea \
-  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.3 \
+  --build-arg HERMES_REF=b2f477a30b3c05d0f383c543af98496ae8a96070 \
+  --build-arg HERMES_SOURCE_SHA256=a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742 \
+  --build-arg IMAGE_VERSION=v2026.4.7-b2f477a \
+  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
   -t ghcr.io/aidencole98/hermes-agent-umbrel:latest \
   --push \
   .
@@ -115,7 +119,7 @@ docker run --rm -it \
   -e API_SERVER_HOST=0.0.0.0 \
   -e API_SERVER_PORT=8000 \
   -v hermes-data:/opt/data \
-  ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.3 \
+  ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
   gateway run
 ```
 

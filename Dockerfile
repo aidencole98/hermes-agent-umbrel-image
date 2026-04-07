@@ -1,7 +1,8 @@
 FROM debian:13.4@sha256:55a15a112b42be10bfc8092fcc40b6748dc236f7ef46a358d9392b339e9d60e8
 
-ARG HERMES_VERSION=v2026.4.3
-ARG HERMES_SOURCE_SHA256=80033597933cd76e7604653219c36822b9aabe7644a4abc106e4e26abf14d9ea
+ARG HERMES_REF=b2f477a30b3c05d0f383c543af98496ae8a96070
+ARG HERMES_SOURCE_SHA256=a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742
+ARG IMAGE_VERSION=v2026.4.7-b2f477a
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV HERMES_HOME=/opt/data
@@ -10,7 +11,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /opt/hermes
 
-ADD https://github.com/NousResearch/hermes-agent/archive/refs/tags/${HERMES_VERSION}.tar.gz /tmp/hermes-agent.tar.gz
+ADD https://github.com/NousResearch/hermes-agent/archive/${HERMES_REF}.tar.gz /tmp/hermes-agent.tar.gz
 
 RUN set -eux; \
     echo "${HERMES_SOURCE_SHA256}  /tmp/hermes-agent.tar.gz" | sha256sum -c -; \
@@ -44,7 +45,7 @@ LABEL org.opencontainers.image.description="Multi-arch Umbrel image for NousRese
 LABEL org.opencontainers.image.source="https://github.com/aidencole98/hermes-agent-umbrel-image"
 LABEL org.opencontainers.image.url="https://github.com/aidencole98/hermes-agent-umbrel-image"
 LABEL org.opencontainers.image.vendor="Umbrel"
-LABEL org.opencontainers.image.version="${HERMES_VERSION}"
+LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
 
 VOLUME ["/opt/data"]
 
