@@ -26,6 +26,9 @@ RUN set -eux; \
 
 COPY --chown=1000:1000 web-ui/server.cjs /app/server.cjs
 COPY --chown=1000:1000 web-ui/site/ /app/site/
+COPY --chown=1000:1000 web-ui/bin/hermes /app/bin/hermes
+
+RUN chmod +x /app/bin/hermes
 
 ENV HOME=/home/hermes
 ENV HERMES_HOME=/opt/data

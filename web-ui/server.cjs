@@ -135,6 +135,8 @@ function spawnShell() {
       HOME: process.env.HOME || "/home/hermes",
       HERMES_HOME: DATA_DIR,
       PWD: DATA_DIR,
+      PATH: `/app/bin:${process.env.PATH || "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"}`,
+      REAL_HERMES_BIN: process.env.REAL_HERMES_BIN || "/usr/local/bin/hermes",
       SHELL,
       TERM
     }

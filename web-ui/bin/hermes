@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REAL_HERMES_BIN="${REAL_HERMES_BIN:-/usr/local/bin/hermes}"
+
+if [[ "${1:-}" == "update" ]]; then
+  printf '%s\n' 'Directly updating Hermes Agent is not recommended on umbrelOS. Please update through the Umbrel App Store.'
+  exit 0
+fi
+
+exec "$REAL_HERMES_BIN" "$@"
