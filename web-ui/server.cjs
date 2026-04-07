@@ -11,7 +11,71 @@ const SITE_DIR = path.join(APP_DIR, "site");
 const DATA_DIR = process.env.HERMES_HOME || "/opt/data";
 const SHELL = process.env.SHELL || "/bin/bash";
 const TERM = "xterm-256color";
-const START_COMMAND = process.env.HERMES_WEB_COMMAND || "cd /opt/data && exec hermes";
+const START_COMMAND = process.env.HERMES_WEB_COMMAND || `
+cd /opt/data
+if HERMES_HOME=/opt/data python3 - <<'PY'
+import os
+import sys
+from pathlib import Path
+
+try:
+    import yaml
+except Exception:
+    sys.exit(1)
+
+home = Path('/opt/data')
+stock_default = 'anthropic/claude-opus-4.6'
+stock_provider = 'auto'
+stock_base_url = 'https://openrouter.ai/api/v1'
+credential_prefixes = (
+    'OPENROUTER_', 'OPENAI_', 'ANTHROPIC_', 'GOOGLE_', 'GEMINI_', 'NOUS_', 'HF_',
+    'GITHUB_', 'GLM_', 'KIMI_', 'MINIMAX_', 'AI_GATEWAY_', 'KILOCODE_', 'OLLAMA_'
+)
+
+for key, value in os.environ.items():
+    if key.startswith(credential_prefixes) and value.strip():
+        sys.exit(0)
+
+env_file = home / '.env'
+if env_file.exists():
+    for line in env_file.read_text(errors='ignore').splitlines():
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        value = value.strip().strip('"').strip("'")
+        if key.startswith(credential_prefixes) and value:
+            sys.exit(0)
+
+auth_file = home / 'auth.json'
+if auth_file.exists() and auth_file.stat().st_size > 2:
+    sys.exit(0)
+
+config_file = home / 'config.yaml'
+if not config_file.exists():
+    sys.exit(1)
+
+config = yaml.safe_load(config_file.read_text(errors='ignore')) or {}
+model = config.get('model', {})
+configured = False
+if isinstance(model, dict):
+    default = str(model.get('default', '') or '').strip()
+    provider = str(model.get('provider', '') or '').strip()
+    base_url = str(model.get('base_url', '') or '').strip()
+    api_key = str(model.get('api_key', '') or '').strip()
+    configured = bool(api_key) or (provider not in ('', stock_provider)) or (base_url not in ('', stock_base_url)) or (default not in ('', stock_default))
+elif isinstance(model, str):
+    configured = bool(model.strip()) and model.strip() != stock_default
+
+sys.exit(0 if configured else 1)
+PY
+then
+  hermes || true
+else
+  hermes model || true
+fi
+exec bash --login -i
+`;
 
 let activePty = null;
 
