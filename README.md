@@ -3,7 +3,7 @@
 Public image-source repository for:
 
 - `ghcr.io/aidencole98/hermes-agent-umbrel` — multi-arch replacement for the upstream `NousResearch/hermes-agent` container
-- `ghcr.io/aidencole98/hermes-agent-web-ui` — multi-arch landing-page image for the Umbrel package
+- `ghcr.io/aidencole98/hermes-agent-web-ui` — multi-arch browser terminal image for the Umbrel package
 - `ghcr.io/aidencole98/hermes-workspace-umbrel` — multi-arch Hermes Workspace runtime for Umbrel
 
 This package is intentionally kept close to upstream Hermes Agent so it can later be swapped back to an official image with minimal compose changes. The current Umbrel build tracks upstream `main` at commit `b2f477a30b3c05d0f383c543af98496ae8a96070` (`2026-04-07`) because the branch has moved well past the last tagged release.
@@ -50,7 +50,7 @@ The main difference is platform support: this image is built for both `linux/amd
 
 - `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a`
 - `ghcr.io/aidencole98/hermes-agent-umbrel:latest`
-- `ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.3`
+- `ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.7-b2f477a`
 - `ghcr.io/aidencole98/hermes-agent-web-ui:latest`
 - `ghcr.io/aidencole98/hermes-workspace-umbrel:0.1.0`
 - `ghcr.io/aidencole98/hermes-workspace-umbrel:latest`
@@ -108,6 +108,20 @@ docker buildx build \
   .
 ```
 
+Build and push the Hermes web UI image:
+
+```bash
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --build-arg HERMES_BASE_IMAGE=ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
+  --build-arg IMAGE_VERSION=v2026.4.7-b2f477a \
+  -f web-ui/Dockerfile \
+  -t ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.7-b2f477a \
+  -t ghcr.io/aidencole98/hermes-agent-web-ui:latest \
+  --push \
+  .
+```
+
 ## Run
 
 Example:
@@ -124,6 +138,18 @@ docker run --rm -it \
 ```
 
 The container preserves the upstream `/opt/data` data volume and entrypoint bootstrap behavior. Runtime configuration continues to happen through the same `API_SERVER_*` and related Hermes environment variables used upstream.
+
+## Hermes Web UI
+
+The `hermes-agent-web-ui` image is now a browser terminal, not a static landing page. It is built from the Hermes backend image so the same `hermes` CLI is available inside the web container.
+
+- Base image: `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a`
+- Runs a Node server with `node-pty` and `ws`
+- Starts an interactive shell in `/opt/data`
+- Reuses the same `/opt/data` volume as the backend container
+- Runs as uid/gid `1000:1000`
+
+From the browser terminal, users can run `hermes model` if needed and then `hermes` to start their session.
 
 ## GitHub Actions
 

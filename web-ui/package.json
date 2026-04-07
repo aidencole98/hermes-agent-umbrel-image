@@ -1,0 +1,12 @@
+{
+  "name": "hermes-agent-web-ui",
+  "version": "2026.4.7",
+  "private": true,
+  "description": "Hermes Agent Umbrel browser terminal UI",
+  "dependencies": {
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/xterm": "^5.5.0",
+    "node-pty": "^1.0.0",
+    "ws": "^8.18.3"
+  }
+}

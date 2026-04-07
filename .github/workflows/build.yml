@@ -105,6 +105,9 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
+          build-args: |
+            HERMES_BASE_IMAGE=ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a
+            IMAGE_VERSION=v2026.4.7-b2f477a
 
   workspace:
     runs-on: ubuntu-latest
