@@ -58,8 +58,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
           build-args: |
-            HERMES_VERSION=v2026.4.3
-            HERMES_SOURCE_SHA256=80033597933cd76e7604653219c36822b9aabe7644a4abc106e4e26abf14d9ea
+            HERMES_REF=b2f477a30b3c05d0f383c543af98496ae8a96070
+            HERMES_SOURCE_SHA256=a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742
+            IMAGE_VERSION=v2026.4.7-b2f477a
 
   web-ui:
     runs-on: ubuntu-latest
