@@ -85,6 +85,80 @@ const MIME_TYPES = {
   ".webp": "image/webp"
 };
 
+const USER_MESSAGING_PLATFORMS = new Set([
+  "telegram",
+  "discord",
+  "whatsapp",
+  "slack",
+  "signal",
+  "mattermost",
+  "matrix",
+  "email",
+  "sms",
+  "dingtalk",
+  "feishu",
+  "wecom",
+  "weixin",
+  "bluebubbles"
+]);
+
+function getUiState() {
+  const script = `
+import json
+import sys
+
+try:
+    from gateway.config import load_gateway_config
+except Exception:
+    print(json.dumps({"showMessagingRestartTip": True, "connectedPlatforms": []}))
+    sys.exit(0)
+
+try:
+    cfg = load_gateway_config()
+    getter = getattr(cfg, "get_connected_platforms", None)
+    if not callable(getter):
+        raise TypeError("get_connected_platforms missing")
+    raw = getter()
+    names = []
+    if isinstance(raw, (list, tuple, set)):
+        for item in raw:
+            value = getattr(item, "value", item)
+            if isinstance(value, str):
+                names.append(value)
+    print(json.dumps({"showMessagingRestartTip": False, "connectedPlatforms": names}))
+except Exception:
+    print(json.dumps({"showMessagingRestartTip": True, "connectedPlatforms": []}))
+`.trim();
+
+  try {
+    const result = require("child_process").spawnSync("python3", ["-c", script], {
+      cwd: DATA_DIR,
+      env: {
+        ...process.env,
+        HERMES_HOME: DATA_DIR,
+        HOME: process.env.HOME || "/home/hermes"
+      },
+      encoding: "utf8",
+      timeout: 5000
+    });
+
+    const payload = JSON.parse((result.stdout || "").trim() || "{}");
+    const connectedPlatforms = Array.isArray(payload.connectedPlatforms)
+      ? payload.connectedPlatforms.filter((name) => USER_MESSAGING_PLATFORMS.has(String(name || "").toLowerCase()))
+      : [];
+
+    return {
+      showMessagingRestartTip: connectedPlatforms.length === 0,
+      connectedPlatforms
+    };
+  } catch (error) {
+    return {
+      showMessagingRestartTip: true,
+      connectedPlatforms: []
+    };
+  }
+}
+
 function resolveStaticPath(urlPath) {
   const normalized = urlPath === "/" ? "/index.html" : urlPath;
   const filePath = path.normalize(path.join(SITE_DIR, normalized));
@@ -147,6 +221,12 @@ const server = http.createServer((req, res) => {
   if (pathname === "/health") {
     res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
     res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  if (pathname === "/api/ui-state") {
+    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify(getUiState()));
     return;
   }
 

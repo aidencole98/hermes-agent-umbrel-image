@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const footerMessage = document.getElementById('footer-message');
   const restartButton = document.getElementById('btn-restart');
+  const gatewayRestartTip = document.getElementById('gateway-restart-tip');
 
   const term = new Terminal({
     cursorBlink: true,
@@ -50,6 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (navigator.platform.indexOf('Mac') !== -1) {
     document.getElementById('paste-hint').textContent = '⌘V';
+  }
+
+  if (gatewayRestartTip) {
+    fetch('/api/ui-state')
+      .then((response) => response.ok ? response.json() : null)
+      .then((state) => {
+        if (!state || typeof state.showMessagingRestartTip !== 'boolean') return;
+        if (!state.showMessagingRestartTip) {
+          gatewayRestartTip.style.display = 'none';
+        }
+      })
+      .catch(() => {
+        // Fail silent. Default HTML keeps the tip visible.
+      });
   }
 
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
