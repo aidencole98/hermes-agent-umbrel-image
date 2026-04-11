@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (msg.type === 'output') {
         term.write(msg.data);
       } else if (msg.type === 'exit') {
-        term.write('\r\n\x1b[38;5;242mTerminal session ended. Click "Start over" below to open a fresh shell.\x1b[0m\r\n');
+        term.write('\r\n\x1b[38;5;242mTerminal session ended. Click "Start over" below to open a fresh Hermes session.\x1b[0m\r\n');
         setFooter('Terminal exited unexpectedly.', 'error');
       }
     } catch (e) {}

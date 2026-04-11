@@ -1,7 +1,7 @@
-ARG HERMES_BASE_IMAGE=ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a
+ARG HERMES_BASE_IMAGE=nousresearch/hermes-agent:latest
 FROM ${HERMES_BASE_IMAGE}
 
-ARG IMAGE_VERSION=v2026.4.7-b2f477a
+ARG IMAGE_VERSION=upstream-latest
 
 LABEL org.opencontainers.image.title="hermes-agent-web-ui"
 LABEL org.opencontainers.image.description="Hermes Agent browser terminal UI for Umbrel"

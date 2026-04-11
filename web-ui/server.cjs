@@ -21,7 +21,7 @@ from pathlib import Path
 try:
     import yaml
 except Exception:
-    sys.exit(1)
+    sys.exit(10)
 
 home = Path('/opt/data')
 stock_default = 'anthropic/claude-opus-4.6'
@@ -47,13 +47,9 @@ if env_file.exists():
         if key.startswith(credential_prefixes) and value:
             sys.exit(0)
 
-auth_file = home / 'auth.json'
-if auth_file.exists() and auth_file.stat().st_size > 2:
-    sys.exit(0)
-
 config_file = home / 'config.yaml'
 if not config_file.exists():
-    sys.exit(1)
+    sys.exit(10)
 
 config = yaml.safe_load(config_file.read_text(errors='ignore')) or {}
 model = config.get('model', {})
@@ -67,12 +63,12 @@ if isinstance(model, dict):
 elif isinstance(model, str):
     configured = bool(model.strip()) and model.strip() != stock_default
 
-sys.exit(0 if configured else 1)
+sys.exit(0 if configured else 10)
 PY
 then
   hermes || true
 else
-  hermes model || true
+  hermes setup || true
 fi
 exec bash --login -i
 `;
