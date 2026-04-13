@@ -2,11 +2,10 @@
 
 Public image-source repository for:
 
-- `ghcr.io/aidencole98/hermes-agent-umbrel` — multi-arch replacement for the upstream `NousResearch/hermes-agent` container
-- `ghcr.io/aidencole98/hermes-agent-web-ui` — multi-arch browser terminal image for the Umbrel package
-- `ghcr.io/aidencole98/hermes-workspace-umbrel` — multi-arch Hermes Workspace runtime for Umbrel
+- `ghcr.io/aidencole98/hermes-agent-umbrel` — multi-arch Umbrel image built from the official `NousResearch/hermes-agent` source, including the official built-in web dashboard
+- `ghcr.io/aidencole98/hermes-workspace-umbrel` — legacy multi-arch Hermes Workspace runtime for Umbrel
 
-This package is intentionally kept close to upstream Hermes Agent so it can later be swapped back to an official image with minimal compose changes. The current Umbrel build tracks upstream `main` at commit `b2f477a30b3c05d0f383c543af98496ae8a96070` (`2026-04-07`) because the branch has moved well past the last tagged release.
+The current Umbrel build tracks the official upstream `v2026.4.13` release, which introduced Hermes Agent's built-in local web dashboard. The older custom `hermes-agent-web-ui` preview path is stale and is no longer used by the Umbrel package.
 
 - Debian-based image
 - source unpacked into `/opt/hermes`
@@ -23,11 +22,10 @@ The main difference is platform support: this image is built for both `linux/amd
 ## Upstream Source
 
 - Upstream repo: <https://github.com/NousResearch/hermes-agent>
-- Last tagged upstream release: `v2026.4.3`
-- Current packaged upstream ref: `b2f477a30b3c05d0f383c543af98496ae8a96070`
-- Commit date: `2026-04-07T08:40:22-04:00`
-- Source tarball: <https://github.com/NousResearch/hermes-agent/archive/b2f477a30b3c05d0f383c543af98496ae8a96070.tar.gz>
-- Source sha256: `a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742`
+- Current packaged upstream release: `v2026.4.13` (`Hermes Agent v0.9.0`)
+- Release URL: <https://github.com/NousResearch/hermes-agent/releases/tag/v2026.4.13>
+- Source tarball: <https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.4.13.tar.gz>
+- Source sha256: `5e4529b8cb6e4821eb916b81517e48125109b1764d6d1e68a204a9f0ddf2d98c`
 - Base image: `debian:13.4@sha256:55a15a112b42be10bfc8092fcc40b6748dc236f7ef46a358d9392b339e9d60e8`
 
 ## Workspace Source
@@ -48,14 +46,12 @@ The main difference is platform support: this image is built for both `linux/amd
 
 ## Image Tags
 
-- `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a`
+- `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.13-official-webui`
 - `ghcr.io/aidencole98/hermes-agent-umbrel:latest`
-- `ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.7-b2f477a`
-- `ghcr.io/aidencole98/hermes-agent-web-ui:latest`
 - `ghcr.io/aidencole98/hermes-workspace-umbrel:0.1.0`
 - `ghcr.io/aidencole98/hermes-workspace-umbrel:latest`
 
-`v2026.4.7-b2f477a` is the current Hermes Agent Umbrel image tag and packages upstream `main` at `b2f477a30b3c05d0f383c543af98496ae8a96070`. `0.1.0` is the current Hermes Workspace source version. `latest` tracks the default branch build. On repo tag pushes, GitHub Actions also publishes matching `v*` tags for all three images.
+`v2026.4.13-official-webui` is the current Hermes Agent Umbrel image tag and packages the official upstream `v2026.4.13` release with the built-in dashboard. `0.1.0` is the current Hermes Workspace source version. `latest` tracks the default branch build. On repo tag pushes, GitHub Actions also publishes matching `v*` tags for the maintained images.
 
 ## Build
 
@@ -71,10 +67,10 @@ Build and push the release tag:
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg HERMES_REF=b2f477a30b3c05d0f383c543af98496ae8a96070 \
-  --build-arg HERMES_SOURCE_SHA256=a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742 \
-  --build-arg IMAGE_VERSION=v2026.4.7-b2f477a \
-  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
+  --build-arg HERMES_REF=v2026.4.13 \
+  --build-arg HERMES_SOURCE_SHA256=5e4529b8cb6e4821eb916b81517e48125109b1764d6d1e68a204a9f0ddf2d98c \
+  --build-arg IMAGE_VERSION=v2026.4.13-official-webui \
+  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.13-official-webui \
   --push \
   .
 ```
@@ -84,10 +80,10 @@ Build and push both the release tag and `latest`:
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg HERMES_REF=b2f477a30b3c05d0f383c543af98496ae8a96070 \
-  --build-arg HERMES_SOURCE_SHA256=a1c3455e65d7948746046314c69bf39833d915ca6da75d74e47a89289a36c742 \
-  --build-arg IMAGE_VERSION=v2026.4.7-b2f477a \
-  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
+  --build-arg HERMES_REF=v2026.4.13 \
+  --build-arg HERMES_SOURCE_SHA256=5e4529b8cb6e4821eb916b81517e48125109b1764d6d1e68a204a9f0ddf2d98c \
+  --build-arg IMAGE_VERSION=v2026.4.13-official-webui \
+  -t ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.13-official-webui \
   -t ghcr.io/aidencole98/hermes-agent-umbrel:latest \
   --push \
   .
@@ -108,19 +104,7 @@ docker buildx build \
   .
 ```
 
-Build and push the Hermes web UI image:
-
-```bash
-docker buildx build \
-  --platform linux/amd64,linux/arm64 \
-  --build-arg HERMES_BASE_IMAGE=ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
-  --build-arg IMAGE_VERSION=v2026.4.7-b2f477a \
-  -f web-ui/Dockerfile \
-  -t ghcr.io/aidencole98/hermes-agent-web-ui:v2026.4.7-b2f477a \
-  -t ghcr.io/aidencole98/hermes-agent-web-ui:latest \
-  --push \
-  .
-```
+The old custom Hermes web UI image is no longer part of the supported build flow. The Umbrel package now uses the official dashboard that ships from the main Hermes Agent image.
 
 ## Run
 
@@ -128,35 +112,30 @@ Example:
 
 ```bash
 docker run --rm -it \
-  -p 8000:8000 \
-  -e API_SERVER_ENABLED=true \
-  -e API_SERVER_HOST=0.0.0.0 \
-  -e API_SERVER_PORT=8000 \
+  -p 9119:9119 \
   -v hermes-data:/opt/data \
-  ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a \
-  gateway run
+  ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.13-official-webui \
+  /opt/hermes/.venv/bin/python -m hermes_cli.main dashboard --host 0.0.0.0 --port 9119 --no-open
 ```
 
-The container preserves the upstream `/opt/data` data volume and entrypoint bootstrap behavior. Runtime configuration continues to happen through the same `API_SERVER_*` and related Hermes environment variables used upstream.
+The container preserves the upstream `/opt/data` data volume and entrypoint bootstrap behavior. In Umbrel, the same image is used twice: one container runs `gateway run` and the other runs the official dashboard command.
 
-## Hermes Web UI
+## Official Hermes Dashboard
 
-The `hermes-agent-web-ui` image is now a browser terminal, not a static landing page. It is built from the Hermes backend image so the same `hermes` CLI is available inside the web container.
+The official dashboard ships from the Hermes Agent source tree itself.
 
-- Base image: `ghcr.io/aidencole98/hermes-agent-umbrel:v2026.4.7-b2f477a`
-- Runs a Node server with `node-pty` and `ws`
-- Starts an interactive shell in `/opt/data`
-- Reuses the same `/opt/data` volume as the backend container
-- Runs as uid/gid `1000:1000`
-
-From the browser terminal, users can run `hermes model` if needed and then `hermes` to start their session.
+- Frontend source: `/opt/hermes/web`
+- Built assets: `/opt/hermes/hermes_cli/web_dist`
+- Backend server: `hermes_cli/web_server.py`
+- Runtime command: `/opt/hermes/.venv/bin/python -m hermes_cli.main dashboard --host 0.0.0.0 --port 9119 --no-open`
+- Reuses the same `/opt/data` volume as the gateway container
+- Runs correctly as uid/gid `1000:1000` in Umbrel
 
 ## GitHub Actions
 
-`.github/workflows/build.yml` publishes both images:
+`.github/workflows/build.yml` publishes the maintained images:
 
 - `ghcr.io/aidencole98/hermes-agent-umbrel`
-- `ghcr.io/aidencole98/hermes-agent-web-ui`
 - `ghcr.io/aidencole98/hermes-workspace-umbrel`
 
 Tags published:
